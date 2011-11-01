@@ -3,5 +3,7 @@ Flask-OpenID==1.0.1
 Jinja2==2.6
 SQLAlchemy==0.7.3
 Werkzeug==0.8.1
+distribute==0.6.19
+-e svn+http://svn.douban.com/svn/shire/trunk/extmods/doubanldap@88110#egg=doubanldap-dev_r88110
 python-openid==2.2.5
 wsgiref==0.1.2
