@@ -117,7 +117,7 @@ def endpoint(request):
             query = pickle.loads(base64.decodestring(query['data']))
         else:
             return direct_to_template(request, 'server/login.html', 
-            {'ret': '', 'data': base64.encodestring(pickle.dumps(query)), 
+            {'ret': '', 'data': base64.encodestring(pickle.dumps(query)).strip('\n'), 
              'url': getViewURL(request, endpoint), 'referer': request.META.get('HTTP_REFERER', '')})
     else:
         query = util.normalDict(request.GET or request.POST)
