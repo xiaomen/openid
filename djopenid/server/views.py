@@ -110,6 +110,7 @@ def endpoint(request):
     """
     import pickle, base64
     if not util.isLogging(request):
+        return http.HttpResponseRedirect('/auth/')
         query = util.normalDict(request.GET or request.POST)
         if query.get('data', ''):
             if not util.authWithLdap(request, query.get('user'), query.get('passwd')):
@@ -119,8 +120,9 @@ def endpoint(request):
             return direct_to_template(request, 'server/login.html', 
             {'ret': '', 'data': base64.encodestring(pickle.dumps(query)).strip('\n'), 
              'url': getViewURL(request, endpoint), 'referer': request.META.get('HTTP_REFERER', '')})
-    else:
-        query = util.normalDict(request.GET or request.POST)
+        else:
+            pass
+    query = util.normalDict(request.GET or request.POST)
 
     s = getServer(request)
 
