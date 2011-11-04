@@ -1,5 +1,5 @@
 <p>{{ ret }}</p>
-<FORM action=/auth/ method=POST>
+<FORM action={{ url }} method=POST>
     <table id="login">
         <tr>
             <td>User: </td>
@@ -7,7 +7,11 @@
         </tr>
         <tr>
             <td>Password: </td>
-            <td><input type="password" name=passwd></td>
+            <td><input type="password" name="passwd"></td>
+        </tr>
+        <tr>
+            <td>Remember: </td>
+            <td><input type="checkbox" name="remember"></td>
         </tr>
         <tr>
             <td></td>
@@ -15,7 +19,11 @@
         </tr>
         <tr>
             <td></td>
-            <td><input type=text hidden=true value={{ referer }} name='referer'></td>
+            <td><input type=text hidden=true value="{{ referer }}" name="referer"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type=text hidden=true value="{{ data }}" name="data"></td>
         </tr>
     </table>
 </form>
