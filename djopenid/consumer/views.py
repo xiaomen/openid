@@ -89,7 +89,7 @@ def startOpenID(request):
         # are optional, some are required.  It's possible that the
         # server doesn't support sreg or won't return any of the
         # fields.
-        sreg_request = sreg.SRegRequest(optional=['cn', 'objectClass'],
+        sreg_request = sreg.SRegRequest(optional=['cn', 'sn'],
                                         required=['mail'])
         auth_request.addExtension(sreg_request)
 
