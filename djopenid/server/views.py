@@ -262,6 +262,7 @@ def processTrustResult(request):
            openid_request.trust_root not in request.session['auth_sites']:
             print 123
             request.session['auth_sites'].append(openid_request.trust_root)
+            print request.session.get('auth_sites', None), '&&&&&'
         else:
             print 456
             request.session['auth_sites'] = [openid_request.trust_root, ]
