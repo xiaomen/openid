@@ -218,10 +218,9 @@ def showDecidePage(request, openid_request):
 
     pape_request = pape.Request.fromOpenIDRequest(openid_request)
 
-    if request.session.get('auth_sites', None) and \
-           openid_request.trust_root in request.session['auth_sites']:
-            request.POST = ['allow', ]
-    return processTrustResult(request)
+    if request.session.get('auth_sites', None) and trust_root in request.session['auth_sites']:
+        request.POST = ['allow', ]
+        return processTrustResult(request)
 
     return direct_to_template(
         request,
