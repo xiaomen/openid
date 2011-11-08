@@ -135,6 +135,7 @@ def endpoint(request):
             'server/endpoint.html',
             {'error': str(why)})
 
+    print '*****', request.session.get('auth_sites', None)
     if request.session.get('auth_sites', None) and \
        openid_request.trust_root in request.session['auth_sites']:
         request.POST = ['allow', ]
