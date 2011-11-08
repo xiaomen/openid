@@ -223,7 +223,7 @@ def showDecidePage(request, openid_request):
         trust_root_valid = "Unreachable"
 
     pape_request = pape.Request.fromOpenIDRequest(openid_request)
-    request.session['trust_root'] = trust_root
+
     return direct_to_template(
         request,
         'server/trust.html',
@@ -258,10 +258,10 @@ def processTrustResult(request):
     # Send Simple Registration data in the response, if appropriate.
     if allowed:
         if request.session.get('auth_sites', None) and \
-           request.session['trust_root'] not in request.session['auth_sites']:
-            request.session['auth_sites'].append(request.session['trust_root'])
+           openid_request.trust_root not in request.session['auth_sites']:
+            request.session['auth_sites'].append(openid_request.trust_root)
         else:
-            request.session['auth_sites'] = [request.session['trust_root'], ]
+            request.session['auth_sites'] = [openid_request.trust_root, ]
 
         sreg_data = dict((k, str(v)) for k, v in request.session['ldap_info'].iteritems())
 
