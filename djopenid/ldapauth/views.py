@@ -18,7 +18,9 @@ def login(request):
         remember = request.POST.get('remember', '')
         if not util.authWithLdap(request, user, passwd):
             return direct_to_template(request, 'server/login.html', {'ret': 'error', 'url': '/auth/'})
+        print remember
         if remember == '':
+            print '******'
             request.session.set_expiry(0)
         if not referer:
             return http.HttpResponseRedirect(getViewURL(request, s_views.server))
