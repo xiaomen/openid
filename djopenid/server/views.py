@@ -207,6 +207,10 @@ def showDecidePage(request, openid_request):
     trust_root = openid_request.trust_root
     return_to = openid_request.return_to
 
+    if request.session.get('auth_sites', None) and trust_root in request.session['auth_sites']:
+        request.POST = ['allow', ]
+        return processTrustResult(request)
+
     try:
         # Stringify because template's ifequal can only compare to strings.
         trust_root_valid = verifyReturnTo(trust_root, return_to) \
@@ -217,10 +221,6 @@ def showDecidePage(request, openid_request):
         trust_root_valid = "Unreachable"
 
     pape_request = pape.Request.fromOpenIDRequest(openid_request)
-
-    if request.session.get('auth_sites', None) and trust_root in request.session['auth_sites']:
-        request.POST = ['allow', ]
-        return processTrustResult(request)
 
     return direct_to_template(
         request,
