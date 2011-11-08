@@ -143,11 +143,6 @@ def endpoint(request):
             'server/endpoint.html',
             {})
 
-    if request.session.get('auth_sites', None) and \
-       openid_request.trust_root in request.session['auth_sites']:
-        request.POST = ['allow', ]
-        return processTrustResult(request)
-
     # We got a request; if the mode is checkid_*, we will handle it by
     # getting feedback from the user or by checking the session.
     if openid_request.mode in ["checkid_immediate", "checkid_setup"]:
@@ -199,6 +194,11 @@ def handleCheckIDRequest(request, openid_request):
     else:
         # Store the incoming request object in the session so we can
         # get to it later.
+        if request.session.get('auth_sites', None) and \
+           openid_request.trust_root in request.session['auth_sites']:
+            request.POST = ['allow', ]
+        return processTrustResult(request)
+
         setRequest(request, openid_request)
         return showDecidePage(request, openid_request)
 
