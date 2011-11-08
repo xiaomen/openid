@@ -36,9 +36,7 @@ def authWithLdap(request, user, passwd, remember):
         request.session['ldap_login'] = 1
         request.session['ldap_info'] = ldap_check.searchuserbyid(user)[0]
         request.session['ldap_uid'] = user
-        print remember
         if remember == '':
-            print '******'
             request.session.set_expiry(0)
         return True
     except:
