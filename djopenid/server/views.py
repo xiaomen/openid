@@ -194,10 +194,6 @@ def handleCheckIDRequest(request, openid_request):
     else:
         # Store the incoming request object in the session so we can
         # get to it later.
-        if request.session.get('auth_sites', None) and \
-           openid_request.trust_root in request.session['auth_sites']:
-            request.POST = ['allow', ]
-        return processTrustResult(request)
 
         setRequest(request, openid_request)
         return showDecidePage(request, openid_request)
@@ -221,6 +217,11 @@ def showDecidePage(request, openid_request):
         trust_root_valid = "Unreachable"
 
     pape_request = pape.Request.fromOpenIDRequest(openid_request)
+
+    if request.session.get('auth_sites', None) and \
+           openid_request.trust_root in request.session['auth_sites']:
+            request.POST = ['allow', ]
+    return processTrustResult(request)
 
     return direct_to_template(
         request,
