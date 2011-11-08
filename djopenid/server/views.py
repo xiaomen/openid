@@ -135,11 +135,6 @@ def endpoint(request):
             'server/endpoint.html',
             {'error': str(why)})
 
-    if request.session.get('auth_sites', None) and \
-       openid_request.trust_root in request.session['auth_sites']:
-        request.POST = ['allow', ]
-        return processTrustResult(request)
-
     # If we did not get a request, display text indicating that this
     # is an endpoint.
     if openid_request is None:
@@ -147,6 +142,11 @@ def endpoint(request):
             request,
             'server/endpoint.html',
             {})
+
+    if request.session.get('auth_sites', None) and \
+       openid_request.trust_root in request.session['auth_sites']:
+        request.POST = ['allow', ]
+        return processTrustResult(request)
 
     # We got a request; if the mode is checkid_*, we will handle it by
     # getting feedback from the user or by checking the session.
