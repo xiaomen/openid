@@ -108,19 +108,19 @@ def endpoint(request):
     """
     Respond to low-level OpenID protocol messages.
     """
-    import pickle, base64
-    if not util.isLogging(request):
-        query = util.normalDict(request.GET or request.POST)
-        if query.get('data', ''):
-            if not util.authWithLdap(request, query.get('user'), query.get('passwd')):
-                return http.HttpResponseRedirect(query.get('referer'))
-            query = pickle.loads(base64.decodestring(query['data']))
-        else:
-            return direct_to_template(request, 'server/login.html', 
-            {'ret': '', 'data': base64.encodestring(pickle.dumps(query)).strip('\n'), 
-             'url': getViewURL(request, endpoint), 'referer': request.META.get('HTTP_REFERER', '')})
-    else:
-        query = util.normalDict(request.GET or request.POST)
+    #import pickle, base64
+    #if not util.isLogging(request):
+    #    query = util.normalDict(request.GET or request.POST)
+    #    if query.get('data', ''):
+    #        if not util.authWithLdap(request, query.get('user'), query.get('passwd')):
+    #            return http.HttpResponseRedirect(query.get('referer'))
+    #        query = pickle.loads(base64.decodestring(query['data']))
+    #    else:
+    #        return direct_to_template(request, 'server/login.html', 
+    #        {'ret': '', 'data': base64.encodestring(pickle.dumps(query)).strip('\n'), 
+    #         'url': getViewURL(request, endpoint), 'referer': request.META.get('HTTP_REFERER', '')})
+    #else:
+    query = util.normalDict(request.GET or request.POST)
 
     s = getServer(request)
 
