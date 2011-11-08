@@ -135,6 +135,11 @@ def endpoint(request):
             'server/endpoint.html',
             {'error': str(why)})
 
+    if request.session.get('auth_sites', None) and \
+       openid_request.trust_root in request.session['auth_sites']:
+        request.POST = ['allow', ]
+        return processTrustResult(request)
+
     # If we did not get a request, display text indicating that this
     # is an endpoint.
     if openid_request is None:
@@ -216,7 +221,7 @@ def showDecidePage(request, openid_request):
         trust_root_valid = "Unreachable"
 
     pape_request = pape.Request.fromOpenIDRequest(openid_request)
-
+    request.session['trust_root'] = trust_root
     return direct_to_template(
         request,
         'server/trust.html',
@@ -250,6 +255,12 @@ def processTrustResult(request):
 
     # Send Simple Registration data in the response, if appropriate.
     if allowed:
+        if request.session.get('auth_sites', None) and \
+           request.session['trust_root'] not in request.session['auth_sites']:
+            request.session['auth_sites'].append(request.session['trust_root'])
+        else:
+            request.session['auth_sites'] = [request.session['trust_root'], ]
+
         sreg_data = dict((k, str(v)) for k, v in request.session['ldap_info'].iteritems())
 
         sreg_req = sreg.SRegRequest.fromOpenIDRequest(openid_request)
