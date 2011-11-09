@@ -258,16 +258,17 @@ def processTrustResult(request):
     # If the decision was to allow the verification, respond
     # accordingly.
     allowed = 'allow' in request.POST
+    once = 'once' in request.POST
 
     # Generate a response with the appropriate answer.
     openid_response = openid_request.answer(allowed,
                                             identity=response_identity)
 
     # Send Simple Registration data in the response, if appropriate.
-    if allowed:
-        if not AuthSites.objects.filter(
-                uid = request.session['ldap_uid'],
-                site = openid_request.trust_root):
+    if allowed or once:
+        if not once and AuthSites.objects.filter(
+                        uid = request.session['ldap_uid'],
+                        site = openid_request.trust_root):
 
             auth_site = AuthSites.objects.create(
                             uid = request.session['ldap_uid'],
