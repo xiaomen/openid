@@ -267,7 +267,7 @@ def processTrustResult(request):
 
     # Send Simple Registration data in the response, if appropriate.
     if allowed:
-        if not 'once' in request.POST and AuthSites.objects.filter(
+        if ('allow' in request.POST) and AuthSites.objects.filter(
                         uid = request.session['ldap_uid'],
                         site = openid_request.trust_root):
 
