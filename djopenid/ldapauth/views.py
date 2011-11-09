@@ -1,10 +1,11 @@
 #coding:utf-8
 
-from djopenid import util
-from djopenid.server import views as s_views
-from djopenid.util import getViewURL
 from django import http
 from django.views.generic.simple import direct_to_template
+
+from djopenid import util
+from djopenid.util import getViewURL
+from djopenid.server import views as s_views
 
 def login(request):
     if request.method == 'GET':
