@@ -23,9 +23,8 @@ from doubanldap import DoubanLDAP
 
 def cleanSession(request):
     try:
-        for k in request.session.keys():
-            if k.startswith('ldap'):
-                del request.session[k]
+        request.session.flush()
+        request.session.set_expiry(0)
     except:
         pass
 
