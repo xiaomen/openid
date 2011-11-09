@@ -113,12 +113,15 @@ def endpoint(request):
         query = util.normalDict(request.GET or request.POST)
         if query.get('data', ''):
             if not util.authWithLdap(request, query.get('user'), query.get('passwd'), query.get('remember', '')):
-                return http.HttpResponseRedirect(query.get('referer'))
+                return direct_to_template(request, 'server/login.html', 
+                            {'ret': 'error<a href='+ query.get('referer') + '>back</a>', 
+                            'data': query['data'], 'url': getViewURL(request, endpoint), 
+                            'referer': query.get('referer')})
             query = pickle.loads(base64.decodestring(query['data']))
         else:
             return direct_to_template(request, 'server/login.html', 
-            {'ret': '', 'data': base64.encodestring(pickle.dumps(query)).strip('\n'), 
-             'url': getViewURL(request, endpoint), 'referer': request.META.get('HTTP_REFERER', '')})
+                        {'ret': '', 'data': base64.encodestring(pickle.dumps(query)).strip('\n'), 
+                        'url': getViewURL(request, endpoint), 'referer': request.META.get('HTTP_REFERER', '')})
     else:
         query = util.normalDict(request.GET or request.POST)
 

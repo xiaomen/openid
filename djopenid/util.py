@@ -29,7 +29,7 @@ def cleanSession(request):
     except:
         pass
 
-def authWithLdap(request, user, passwd, remember):
+def authWithLdap(request, user, passwd, remember = ''):
     try:
         ldap_check = DoubanLDAP()
         ldap_check.bind(user, passwd)
