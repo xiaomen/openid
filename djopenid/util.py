@@ -84,15 +84,8 @@ def getOpenIDStore(filestore_path, table_prefix):
         'nonces_table': table_prefix + 'openid_nonces',
     }
 
-    types = {
-        'postgresql': sqlstore.PostgreSQLStore,
-        'mysql': sqlstore.MySQLStore,
-        'sqlite3': sqlstore.SQLiteStore,
-    }
-
     try:
-        s = types[settings.DATABASES['default']['ENGINE']](connection.connection,
-                                            **tablenames)
+        s = sqlstore.MySQLStore(connection.connection, **tablenames)
     except KeyError:
         raise ImproperlyConfigured, \
               "Database engine %s not supported by OpenID library" % \
