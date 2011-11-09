@@ -16,12 +16,15 @@ Some code conventions used here:
 """
 
 import cgi
-
-from djopenid import util
-from djopenid.util import getViewURL
+import pickle
+import base64
 
 from django import http
 from django.views.generic.simple import direct_to_template
+
+from djopenid import util
+from djopenid.util import getViewURL
+from djopenid.server.models import AuthSites
 
 from openid.server.server import Server, ProtocolError, CheckIDRequest, \
      EncodingError
@@ -108,7 +111,6 @@ def endpoint(request):
     """
     Respond to low-level OpenID protocol messages.
     """
-    import pickle, base64
     if not util.isLogging(request):
         query = util.normalDict(request.GET or request.POST)
         if query.get('data', ''):
@@ -210,9 +212,14 @@ def showDecidePage(request, openid_request):
     trust_root = openid_request.trust_root
     return_to = openid_request.return_to
 
-    if request.session.get('auth_sites', None) and trust_root in request.session['auth_sites']:
-        request.POST = ['allow', ]
-        return processTrustResult(request)
+    auth_site = AuthSites.objects.filter(uid = request.session['ldap_uid'], site = trust_root)
+    if auth_site:
+        if auth_site[0].permission == 1:
+            request.POST = ['allow', ]
+            return processTrustResult(request)
+        else:
+            request.POST = []
+            return processTrustResult(request)
 
     try:
         # Stringify because template's ifequal can only compare to strings.
@@ -258,12 +265,15 @@ def processTrustResult(request):
 
     # Send Simple Registration data in the response, if appropriate.
     if allowed:
-        if request.session.get('auth_sites', None) and \
-           openid_request.trust_root not in request.session['auth_sites']:
-            request.session['auth_sites'].append(openid_request.trust_root)
-            request.session.save()
-        else:
-            request.session['auth_sites'] = [openid_request.trust_root, ]
+        if not AuthSites.objects.filter(
+                uid = request.session['ldap_uid'],
+                site = openid_request.trust_root):
+
+            auth_site = AuthSites.objects.create(
+                            uid = request.session['ldap_uid'],
+                            site = openid_request.trust_root,
+                            permission = 1)
+            auth_site.save()
 
         sreg_data = dict((k, str(v)) for k, v in request.session['ldap_info'].iteritems())
 
