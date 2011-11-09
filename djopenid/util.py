@@ -91,12 +91,12 @@ def getOpenIDStore(filestore_path, table_prefix):
     }
 
     try:
-        s = types[settings.DATABASE_ENGINE](connection.connection,
+        s = types[settings.DATABASES['default']['ENGINE']](connection.connection,
                                             **tablenames)
     except KeyError:
         raise ImproperlyConfigured, \
               "Database engine %s not supported by OpenID library" % \
-              (settings.DATABASE_ENGINE,)
+              (settings.DATABASES['default']['ENGINE'],)
 
     try:
         s.createTables()
