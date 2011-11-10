@@ -248,7 +248,6 @@ def showDecidePage(request, openid_request):
             request.POST = []
             return processTrustResult(request)
 
-
     return direct_to_template(
         request,
         'server/trust.html',
