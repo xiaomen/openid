@@ -1,15 +1,14 @@
-<html>
-  <body>
+{% extends "server/index.html" %}
 
-    This is an OpenID server endpoint.  Your browser should never
-    actually request this page.
+{% block head %}
+{% endblock %}
 
-    {% if error %}
-      The OpenID server has encountered an error:
-      <p>
-      {{ error|escape }}
-      </p>
-    {% endif %}
-
-  </body>
-</html>
+{% block body %}
+<div class="box">
+     OpenID验证页面，其实啥也没=__,=
+     {% if error %}
+     <div class="error">OpenID验证服务出错嘞:</div>
+     <div class="error">{{ error|escape }}</div>
+     {% endif %}
+</div>
+{% endblock %}

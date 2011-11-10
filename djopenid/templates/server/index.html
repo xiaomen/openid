@@ -2,6 +2,22 @@
     <head>
         <title>Douban统一账号认证平台</title>
         <style type="text/css">
+        div.message {
+            background: #9f9;
+            padding: 0.5em;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            border: 1px solid #555;
+            font-weight: bold;
+        }
+        div.error {
+            background: #f99;
+            padding: 0.5em;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            border: 1px solid #555;
+            font-weight: bold;
+        }
         div.box {
             background: #eee;
             border: 1px solid black;
@@ -13,7 +29,7 @@
         {% endblock %}
     </head>
     <body>
-        {% block body %}
+    {% block body %}
         <div class="box">
         <table cellspacing=10>
             <tr>
@@ -35,6 +51,6 @@
             </tr>
             {% endfor %}
         </table>
-    {% endblock %}
+  {% endblock %}
   </body>
 </html>
