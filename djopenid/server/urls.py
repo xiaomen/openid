@@ -4,10 +4,10 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns(
     'djopenid.server.views',
     (r'^$', 'server'),
+    (r'^delete/$', 'manager'),
     (r'^xrds/$', 'idpXrds'),
     (r'^processTrustResult/$', 'processTrustResult'),
     (r'^endpoint/$', 'endpoint'),
     (r'^trust/$', 'trustPage'),
     (r'^(?P<user>.*)/$', 'idPage'),
-	(r'^delete/$', 'manager'),
 )
