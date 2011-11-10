@@ -72,6 +72,7 @@ def manager(request):
         or not index or not index.isdigit():
         return http.HttpResponseRedirect('/server/')
     r = AuthSites.objects.filter(uid = request.session['ldap_uid'], id = int(index))
+    print r
     if r:
         r = r[0]
         r.delete()
@@ -227,14 +228,6 @@ def showDecidePage(request, openid_request):
     trust_root = openid_request.trust_root
     return_to = openid_request.return_to
 
-    auth_site = AuthSites.objects.filter(uid = request.session['ldap_uid'], site = trust_root)
-    if auth_site:
-        if auth_site[0].permission == 1:
-            request.POST = ['allow', ]
-            return processTrustResult(request)
-        else:
-            request.POST = []
-            return processTrustResult(request)
     try:
         # Stringify because template's ifequal can only compare to strings.
         trust_root_valid = verifyReturnTo(trust_root, return_to) \
@@ -265,6 +258,15 @@ def processTrustResult(request):
     # Get the request from the session so we can construct the
     # appropriate response.
     openid_request = getRequest(request)
+
+    auth_site = AuthSites.objects.filter(uid = request.session['ldap_uid'], site = openid_request.trust_root)
+    if auth_site:
+        if auth_site[0].permission == 1:
+            request.POST = ['allow', ]
+            return processTrustResult(request)
+        else:
+            request.POST = []
+            return processTrustResult(request)
 
     # The identifier that this server can vouch for
     response_identity = getViewURL(request, idPage, args=[request.session['ldap_uid']])
