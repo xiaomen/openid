@@ -63,6 +63,19 @@ def getRequest(request):
     """
     return request.session.get('openid_request')
 
+def manager(request, index):
+    """
+    Manager auth sites
+    """
+    if not util.isLogging(request) or request.method == 'POST' or not index.isdigit():
+        return http.HttpResponseRedirect('/server/')
+    r = AuthSites.objects.filter(uid = request.session['ldap_uid'], id = int(index))
+    if r:
+        r = r[0]
+        r.delete()
+        r.save()
+    return http.HttpResponse('Success <a href="/server/">back</a>')
+
 def server(request):
     """
     Respond to requests for the server's primary web page.
@@ -73,8 +86,10 @@ def server(request):
         request,
         'server/index.html',
         {'user_url': getViewURL(request, idPage, args=[request.session.get('ldap_uid')]),
+         'user_id': request.session['ldap_uid'],
          'server_xrds_url': getViewURL(request, idpXrds),
-         })
+         'auth_sites': AuthSites.objects.filter(uid = request.session['ldap_uid']),
+        })
 
 def idpXrds(request):
     """
@@ -147,7 +162,7 @@ def endpoint(request):
             request,
             'server/endpoint.html',
             {})
-
+    
     # We got a request; if the mode is checkid_*, we will handle it by
     # getting feedback from the user or by checking the session.
     if openid_request.mode in ["checkid_immediate", "checkid_setup"]:
@@ -176,7 +191,6 @@ def handleCheckIDRequest(request, openid_request):
     if not openid_request.idSelect():
 
         id_url = getViewURL(request, idPage, args=[request.session['ldap_uid']])
-
         # Confirm that this server can actually vouch for that
         # identifier
         if id_url != openid_request.identity:
@@ -220,7 +234,6 @@ def showDecidePage(request, openid_request):
         else:
             request.POST = []
             return processTrustResult(request)
-
     try:
         # Stringify because template's ifequal can only compare to strings.
         trust_root_valid = verifyReturnTo(trust_root, return_to) \
@@ -262,7 +275,6 @@ def processTrustResult(request):
     # Generate a response with the appropriate answer.
     openid_response = openid_request.answer(allowed,
                                             identity=response_identity)
-
     # Send Simple Registration data in the response, if appropriate.
     if allowed:
         if ('allow' in request.POST) and \
