@@ -63,11 +63,13 @@ def getRequest(request):
     """
     return request.session.get('openid_request')
 
-def manager(request, index):
+def manager(request):
     """
     Manager auth sites
     """
-    if not util.isLogging(request) or request.method == 'POST' or not index.isdigit():
+    index = request.GET.get('index')
+    if not util.isLogging(request) or request.method == 'POST'\
+        or not index or not index.isdigit():
         return http.HttpResponseRedirect('/server/')
     r = AuthSites.objects.filter(uid = request.session['ldap_uid'], id = int(index))
     if r:

@@ -54,7 +54,7 @@
         {% for auth_site in auth_sites %}
         <tr>
             <td><a href="{{auth_site.site}}">{{auth_site.site}}</a></td>
-            <td><a href="/server/delete/{{auth_site.id}}">delete</a></td>
+            <td><a href="/server/delete/?index={{auth_site.id}}">delete</a></td>
         </tr>
         {% endfor %}
     </table>
