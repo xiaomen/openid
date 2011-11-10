@@ -228,15 +228,6 @@ def showDecidePage(request, openid_request):
     trust_root = openid_request.trust_root
     return_to = openid_request.return_to
 
-    auth_site = AuthSites.objects.filter(uid = request.session['ldap_uid'], site = trust_root)
-    if auth_site:
-        if auth_site[0].permission == 1:
-            request.POST = ['allow', ]
-            return processTrustResult(request)
-        else:
-            request.POST = []
-            return processTrustResult(request)
-
     try:
         # Stringify because template's ifequal can only compare to strings.
         trust_root_valid = verifyReturnTo(trust_root, return_to) \
@@ -247,6 +238,16 @@ def showDecidePage(request, openid_request):
         trust_root_valid = "Unreachable"
 
     pape_request = pape.Request.fromOpenIDRequest(openid_request)
+
+    auth_site = AuthSites.objects.filter(uid = request.session['ldap_uid'], site = trust_root)
+    if auth_site:
+        if auth_site[0].permission == 1:
+            request.POST = ['allow', ]
+            return processTrustResult(request)
+        else:
+            request.POST = []
+            return processTrustResult(request)
+
 
     return direct_to_template(
         request,
