@@ -9,4 +9,5 @@ urlpatterns = patterns(
     (r'^endpoint/$', 'endpoint'),
     (r'^trust/$', 'trustPage'),
     (r'^(?P<user>.*)/$', 'idPage'),
+	(r'^delete/(?P<index>.*)/$', 'manager'),
 )
