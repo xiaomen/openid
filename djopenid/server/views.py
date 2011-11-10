@@ -72,6 +72,7 @@ def manager(request):
         or not index or not index.isdigit():
         return http.HttpResponseRedirect('/server/')
     r = AuthSites.objects.filter(uid = request.session['ldap_uid'], id = int(index))
+    
     if r:
         r = r[0]
         r.delete()
