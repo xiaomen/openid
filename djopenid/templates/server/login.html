@@ -1,5 +1,13 @@
-<h3>Douban统一账号认证平台</h3>
-<p>{{ ret|safe|escape }}</p>
+{% extends "server/index.html" %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+{% if ret %}
+<div class="message">{{ ret|safe|escape }}</div>
+{% endif %}
+<div class="box">
 <FORM action={{ url }} method=POST>
     <table id="login">
         <tr>
@@ -28,3 +36,5 @@
         </tr>
     </table>
 </form>
+</div>
+{% endblock %}
