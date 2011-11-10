@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Django OpenID Example Consumer</title>
+    <title>Douban统一账号认证平台客户端认证平台</title>
     <style type="text/css">
     div.message {
         background: #9f9;
@@ -32,8 +32,7 @@
   <div class="box">
 
   <p>
-    This is an example consumer built for the Django framework.  Enter
-    an OpenID in the box below.
+    请输入您的OpenID：
   </p>
 
   {% if error %}
@@ -42,12 +41,11 @@
 
   {% if url %}
     <div class="message">
-      OpenID authentication succeeded; you authenticated as
-        <a href="{{ url }}">{{ url|escape }}</a>.
+      OpenID 验证成功; 你的身份为<a href="{{ url }}">{{ url|escape }}</a>.
 
       <p>
       {% if sreg %}
-        Simple Registration data returned:
+        注册信息：
 
         <ul>
         {% for pair in sreg %}
@@ -55,11 +53,11 @@
         {% endfor %}
         </ul>
       {% else %}
-        The server returned no Simple Registration data.
+        服务端未返回任何注册信息：
       {% endif %}
 
       {% if ax %}
-        Attribute Exchange data returned:
+        服务端返回额外信息：
 
         <ul>
         {% for pair in ax %}
@@ -67,19 +65,18 @@
         {% endfor %}
         </ul>
       {% else %}
-        The server returned no Attribute Exchange data.
+        服务端为返回任何额外信息。
       {% endif %}
 
       {% if pape %}
-        An authentication policy response contained these policies:
-
+        服务端返回的验证策略数据：
         <ul>
           {% for uri in pape.auth_policies %}
             <li><tt>{{ uri }}</tt></li>
           {% endfor %}
         </ul>
       {% else %}
-        The server returned no authentication policy data (PAPE).
+        服务端未返回任何额外验证策略数据：
       {% endif %}
       </p>
     </div>
@@ -101,7 +98,7 @@
     <input type="text" size="40" name="openid_identifier" />
 
     <p>
-    Request these authentication policies
+    请求以下验证策略：
       (<a href="http://openid.net/specs/openid-provider-authentication-policy-extension-1_0-02.html">PAPE</a>):
 
     <table>
