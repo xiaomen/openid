@@ -75,7 +75,6 @@ def manager(request):
     if r:
         r = r[0]
         r.delete()
-        r.save()
     return http.HttpResponse('Success <a href="/server/">back</a>')
 
 def server(request):
