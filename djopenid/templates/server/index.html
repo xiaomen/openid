@@ -1,66 +1,40 @@
 <html>
-  <head>
-    <title>Douban统一账号认证平台</title>
-    <style type="text/css">
-    div.message {
-        background: #9f9;
-        padding: 0.5em;
-        margin-top: 0.5em;
-        margin-bottom: 0.5em;
-        border: 1px solid #555;
-        font-weight: bold;
-    }
-
-    div.error {
-        background: #f99;
-        padding: 0.5em;
-        margin-top: 0.5em;
-        margin-bottom: 0.5em;
-        border: 1px solid #555;
-        font-weight: bold;
-    }
-
-    div.box {
-        background: #eee;
-        border: 1px solid black;
-        padding: 1em;
-    }
-    </style>
-    {% block head %}
-    <meta http-equiv="x-xrds-location" content="{{ server_xrds_url }}">
-    {% endblock %}
-  </head>
-  <body>
-
-{% block body %}
-  <div class="box">
-
-  <div>
-    用户: {{ user_id }}
-    <p>
-        openid:
-        <a href="{{ user_url }}">{{ user_url }}</a>
-    </p>
-    <p>
-        logout:
-        <a href="/auth/logout">Logout</a>
-    </p> 
-  </div>
-    <table>
-        <tr>
-            <th>site</th>
-            <th>manager</th>
-        </tr>
-        {% for auth_site in auth_sites %}
-        <tr>
-            <td><a href="{{auth_site.site}}">{{auth_site.site}}</a></td>
-            <td><a href="/server/delete/?index={{auth_site.id}}">delete</a></td>
-        </tr>
-        {% endfor %}
-    </table>
-  </p>
-
-  </div>
+    <head>
+        <title>Douban统一账号认证平台</title>
+        <style type="text/css">
+        div.box {
+            background: #eee;
+            border: 1px solid black;
+            padding: 1em;
+        }
+        </style>
+        {% block head %}
+        <meta http-equiv="x-xrds-location" content="{{ server_xrds_url }}">
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}
+        <div class="box">
+        <table cellspacing=10>
+            <tr>
+                <td>OpenID:</td>
+                <td><a href="{{ user_url }}">{{ user_url }}</a></td>
+                <td>注销:</td>
+                <td><a href="/auth/logout">戳这里</a></td>
+            </tr>
+        </table>
+        <table cellspacing=10>
+            <tr>
+                <th align="left">已授权站点</th>
+                <th align="left">管理</th>
+            </tr>
+            {% for auth_site in auth_sites %}
+            <tr>
+                <td><a href="{{auth_site.site}}">{{auth_site.site}}</a></td>
+                <td><a href="/server/delete/?index={{auth_site.id}}">戳这里取消授权</a></td>
+            </tr>
+            {% endfor %}
+        </table>
     {% endblock %}
   </body>
 </html>
