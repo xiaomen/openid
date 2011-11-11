@@ -10,6 +10,7 @@ from openid.yadis.constants import YADIS_HEADER_NAME, YADIS_CONTENT_TYPE
 from openid.server.trustroot import RP_RETURN_TO_URL_TYPE
 
 from djopenid import util
+from djopenid import settings
 
 PAPE_POLICIES = [
     'AUTH_PHISHING_RESISTANT',
@@ -72,7 +73,7 @@ def startOpenID(request):
     if request.POST:
         # Start OpenID authentication.
         openid_url = request.POST['openid_identifier'] or \
-                     (('http://openid.dapps.douban.com/server/%s/' % request.POST['ldap_identifier']) \
+                     ((settings.BASE_AUTH_SITE % request.POST['ldap_identifier']) \
                      if request.POST['ldap_identifier'] else None)
         c = getConsumer(request)
         error = None
