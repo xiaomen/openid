@@ -63,27 +63,20 @@ def getRequest(request):
     """
     return request.session.get('openid_request')
 
-def manager(request):
-    """
-    Manager auth sites
-    """
-    index = request.GET.get('index')
-    if not util.isLogging(request) or request.method == 'POST'\
-        or not index or not index.isdigit():
-        return http.HttpResponseRedirect('/server/')
-    r = AuthSites.objects.filter(uid = request.session['ldap_uid'], id = int(index))
-    
-    if r:
-        r = r[0]
-        r.delete()
-    return http.HttpResponse('Success <a href="/server/">back</a>')
-
 def server(request):
     """
     Respond to requests for the server's primary web page.
     """
     if not util.isLogging(request):
         return http.HttpResponseRedirect('/auth/')
+
+    index = request.GET.get('delete')
+    if index and index.isdigit():
+        r = AuthSites.objects.filter(uid = request.session['ldap_uid'], id = int(index))
+        if r:
+            r = r[0]
+            r.delete()
+
     return direct_to_template(
         request,
         'server/index.html',

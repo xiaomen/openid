@@ -95,7 +95,16 @@
   {% endif %}
 
   <form method="post" action="{{ consumer_url }}">
-    <input type="text" size="40" name="openid_identifier" />
+    <table>
+      <tr>
+        <td><label for="openid_identifier">完整OpenID：</label></td>
+        <td><input type="text" size="40" name="openid_identifier" /></td>
+      <tr>
+      <tr>
+        <td><label for="ldap_identifier">LDAP Uid:</label></td>
+        <td><input type="text" size="40" name="ldap_identifier" /></td>
+      </tr>
+    </table>
 
     <p>
     请求以下验证策略：

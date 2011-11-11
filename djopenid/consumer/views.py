@@ -71,7 +71,9 @@ def startOpenID(request):
     """
     if request.POST:
         # Start OpenID authentication.
-        openid_url = request.POST['openid_identifier']
+        openid_url = request.POST['openid_identifier'] or \
+                     (('http://openid.dapps.douban.com/server/%s/' % request.POST['ldap_identifier']) \
+                     if request.POST['ldap_identifier'] else None)
         c = getConsumer(request)
         error = None
 
