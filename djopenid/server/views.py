@@ -24,7 +24,6 @@ from django.views.generic.simple import direct_to_template
 
 from djopenid import util
 from djopenid.util import getViewURL
-from djopenid.server.models import AuthSites
 
 from openid.server.server import Server, ProtocolError, CheckIDRequest, \
      EncodingError
@@ -70,20 +69,12 @@ def server(request):
     if not util.isLogging(request):
         return http.HttpResponseRedirect('/auth/')
 
-    index = request.GET.get('delete')
-    if index and index.isdigit():
-        r = AuthSites.objects.filter(uid = request.session['ldap_uid'], id = int(index))
-        if r:
-            r = r[0]
-            r.delete()
-
     return direct_to_template(
         request,
         'server/index.html',
         {'user_url': getViewURL(request, idPage, args=[request.session.get('ldap_uid')]),
          'user_id': request.session['ldap_uid'],
          'server_xrds_url': getViewURL(request, idpXrds),
-         'auth_sites': AuthSites.objects.filter(uid = request.session['ldap_uid']),
         })
 
 def idpXrds(request):
@@ -232,15 +223,6 @@ def showDecidePage(request, openid_request):
 
     pape_request = pape.Request.fromOpenIDRequest(openid_request)
 
-    auth_site = AuthSites.objects.filter(uid = request.session['ldap_uid'], site = trust_root)
-    if auth_site:
-        if auth_site[0].permission == 1:
-            request.POST = ['allow', ]
-            return processTrustResult(request)
-        else:
-            request.POST = []
-            return processTrustResult(request)
-
     return direct_to_template(
         request,
         'server/trust.html',
@@ -266,24 +248,13 @@ def processTrustResult(request):
 
     # If the decision was to allow the verification, respond
     # accordingly.
-    allowed = 'allow' in request.POST or 'once' in request.POST
+    allowed = 'allow' in request.POST
 
     # Generate a response with the appropriate answer.
     openid_response = openid_request.answer(allowed,
                                             identity=response_identity)
     # Send Simple Registration data in the response, if appropriate.
     if allowed:
-        if ('allow' in request.POST) and \
-            not AuthSites.objects.filter(
-                uid = request.session['ldap_uid'],
-                site = openid_request.trust_root):
-            
-            auth_site = AuthSites.objects.create(
-                            uid = request.session['ldap_uid'],
-                            site = openid_request.trust_root,
-                            permission = 1)
-            auth_site.save()
-
         sreg_data = dict((k, str(v)) for k, v in request.session['ldap_info'].iteritems())
 
         sreg_req = sreg.SRegRequest.fromOpenIDRequest(openid_request)
