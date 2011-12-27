@@ -25,6 +25,7 @@ from django.views.generic.simple import direct_to_template
 from djopenid import util
 from djopenid.util import getViewURL
 from djopenid.server.models import AuthSites
+
 from openid.server.server import Server, ProtocolError, CheckIDRequest, \
      EncodingError
 from openid.server.trustroot import verifyReturnTo
@@ -74,7 +75,6 @@ def manager(request):
     if r:
         r = r[0]
         r.delete()
-        r.save()
     return http.HttpResponse('Success <a href="/server/">back</a>')
 
 def server(request):
@@ -83,7 +83,6 @@ def server(request):
     """
     if not util.isLogging(request):
         return http.HttpResponseRedirect('/auth/')
-
     return direct_to_template(
         request,
         'server/index.html',
@@ -143,7 +142,6 @@ def endpoint(request):
                         'url': getViewURL(request, endpoint), 'referer': request.META.get('HTTP_REFERER', '')})
     else:
         query = util.normalDict(request.GET or request.POST)
-#    query = util.normalDict(request.GET or request.POST)
 
     s = getServer(request)
 
@@ -165,7 +163,7 @@ def endpoint(request):
             request,
             'server/endpoint.html',
             {})
-
+    
     # We got a request; if the mode is checkid_*, we will handle it by
     # getting feedback from the user or by checking the session.
     if openid_request.mode in ["checkid_immediate", "checkid_setup"]:
@@ -237,7 +235,6 @@ def showDecidePage(request, openid_request):
         else:
             request.POST = []
             return processTrustResult(request)
-
     try:
         # Stringify because template's ifequal can only compare to strings.
         trust_root_valid = verifyReturnTo(trust_root, return_to) \
@@ -274,17 +271,18 @@ def processTrustResult(request):
 
     # If the decision was to allow the verification, respond
     # accordingly.
-    allowed = 'allow' in request.POST
+    allowed = 'allow' in request.POST or 'once' in request.POST
 
     # Generate a response with the appropriate answer.
     openid_response = openid_request.answer(allowed,
                                             identity=response_identity)
     # Send Simple Registration data in the response, if appropriate.
     if allowed:
-        if not AuthSites.objects.filter(
+        if ('allow' in request.POST) and \
+            not AuthSites.objects.filter(
                 uid = request.session['ldap_uid'],
                 site = openid_request.trust_root):
-
+            
             auth_site = AuthSites.objects.create(
                             uid = request.session['ldap_uid'],
                             site = openid_request.trust_root,
