@@ -24,7 +24,7 @@ from django.views.generic.simple import direct_to_template
 
 from djopenid import util
 from djopenid.util import getViewURL
-
+from djopenid.server.models import AuthSites
 from openid.server.server import Server, ProtocolError, CheckIDRequest, \
      EncodingError
 from openid.server.trustroot import verifyReturnTo
@@ -62,6 +62,21 @@ def getRequest(request):
     """
     return request.session.get('openid_request')
 
+def manager(request):
+    """
+    Manager auth sites
+    """
+    index = request.GET.get('index')
+    if not util.isLogging(request) or request.method == 'POST'\
+        or not index or not index.isdigit():
+        return http.HttpResponseRedirect('/server/')
+    r = AuthSites.objects.filter(uid = request.session['ldap_uid'], id = int(index))
+    if r:
+        r = r[0]
+        r.delete()
+        r.save()
+    return http.HttpResponse('Success <a href="/server/">back</a>')
+
 def server(request):
     """
     Respond to requests for the server's primary web page.
@@ -75,6 +90,7 @@ def server(request):
         {'user_url': getViewURL(request, idPage, args=[request.session.get('ldap_uid')]),
          'user_id': request.session['ldap_uid'],
          'server_xrds_url': getViewURL(request, idpXrds),
+         'auth_sites': AuthSites.objects.filter(uid = request.session['ldap_uid']),
         })
 
 def idpXrds(request):
@@ -127,7 +143,7 @@ def endpoint(request):
                         'url': getViewURL(request, endpoint), 'referer': request.META.get('HTTP_REFERER', '')})
     else:
         query = util.normalDict(request.GET or request.POST)
-    #query = util.normalDict(request.GET or request.POST)
+#    query = util.normalDict(request.GET or request.POST)
 
     s = getServer(request)
 
@@ -149,7 +165,7 @@ def endpoint(request):
             request,
             'server/endpoint.html',
             {})
-    
+
     # We got a request; if the mode is checkid_*, we will handle it by
     # getting feedback from the user or by checking the session.
     if openid_request.mode in ["checkid_immediate", "checkid_setup"]:
@@ -213,6 +229,15 @@ def showDecidePage(request, openid_request):
     trust_root = openid_request.trust_root
     return_to = openid_request.return_to
 
+    auth_site = AuthSites.objects.filter(uid = request.session['ldap_uid'], site = trust_root)
+    if auth_site:
+        if auth_site[0].permission == 1:
+            request.POST = ['allow', ]
+            return processTrustResult(request)
+        else:
+            request.POST = []
+            return processTrustResult(request)
+
     try:
         # Stringify because template's ifequal can only compare to strings.
         trust_root_valid = verifyReturnTo(trust_root, return_to) \
@@ -256,6 +281,16 @@ def processTrustResult(request):
                                             identity=response_identity)
     # Send Simple Registration data in the response, if appropriate.
     if allowed:
+        if not AuthSites.objects.filter(
+                uid = request.session['ldap_uid'],
+                site = openid_request.trust_root):
+
+            auth_site = AuthSites.objects.create(
+                            uid = request.session['ldap_uid'],
+                            site = openid_request.trust_root,
+                            permission = 1)
+            auth_site.save()
+
         sreg_data = dict((k, str(v)) for k, v in request.session['ldap_info'].iteritems())
 
         sreg_req = sreg.SRegRequest.fromOpenIDRequest(openid_request)
