@@ -282,7 +282,7 @@ def processTrustResult(request):
             not AuthSites.objects.filter(
                 uid = request.session['ldap_uid'],
                 site = openid_request.trust_root):
-            
+
             auth_site = AuthSites.objects.create(
                             uid = request.session['ldap_uid'],
                             site = openid_request.trust_root,
