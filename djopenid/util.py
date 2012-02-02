@@ -44,10 +44,9 @@ def authWithLdap(request, user, passwd, remember = ''):
     return False
 
 def isLogging(request):
-    print request.session.keys()
-    if request.session.get('ldap_login', None):
-        return True
-    return False
+    if not request.session.keys() or not request.session.get('ldap_login', None):
+        return False
+    return True
 
 def getOpenIDStore(filestore_path, table_prefix):
     """
