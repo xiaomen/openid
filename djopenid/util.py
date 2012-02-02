@@ -44,7 +44,7 @@ def authWithLdap(request, user, passwd, remember = ''):
     return False
 
 def isLogging(request):
-    print dir(request.session)
+    print request.session.keys()
     if request.session.get('ldap_login', None):
         return True
     return False
