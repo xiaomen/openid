@@ -23,6 +23,7 @@ from django import http
 from django.shortcuts import redirect
 from django.views.generic.simple import direct_to_template
 
+import djopenid
 from djopenid import util
 from djopenid.util import getViewURL
 from djopenid.server.models import AuthSites
