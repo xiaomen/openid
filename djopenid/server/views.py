@@ -177,7 +177,7 @@ def handleCheckIDRequest(request, openid_request):
             continue
     if not openid_request.idSelect():
 
-        id_url = getViewURL(request, idPage, args=[request.session['ldap_uid']])
+        id_url = getViewURL(request, idPage, args=[request.session.get('ldap_uid', 'NoSuchUser')])
         # Confirm that this server can actually vouch for that
         # identifier
         if id_url != openid_request.identity:
