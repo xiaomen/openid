@@ -23,9 +23,9 @@ from django import http
 from django.shortcuts import redirect
 from django.views.generic.simple import direct_to_template
 
-import djopenid
 from djopenid import util
 from djopenid.util import getViewURL
+from djopenid.ldapauth.views import login
 from djopenid.server.models import AuthSites
 
 from openid.server.server import Server, ProtocolError, CheckIDRequest, \
@@ -113,8 +113,7 @@ def idPage(request, user):
             request,
             'server/idPage.html',
             {'server_url': getViewURL(request, endpoint)})
-
-    return redirect(getViewURL(request, djopenid.ldapauth.views.login))
+    return redirect(getViewURL(request, login))
 
 def trustPage(request):
     """
