@@ -113,7 +113,8 @@ def idPage(request, user):
             request,
             'server/idPage.html',
             {'server_url': getViewURL(request, endpoint)})
-    return redirect(getViewURL(request, 'ldapauth.login'))
+
+    return redirect(getViewURL(request, djopenid.ldapauth.views.login))
 
 def trustPage(request):
     """
