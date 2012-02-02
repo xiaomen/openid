@@ -144,7 +144,7 @@ def endpoint(request):
 
     # If we did not get a request, display text indicating that this
     # is an endpoint.
-    if openid_request is None or not util.isLogging(request):
+    if openid_request is None:
         return direct_to_template(
             request,
             'server/endpoint.html',
