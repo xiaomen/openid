@@ -20,6 +20,7 @@ import pickle
 import base64
 
 from django import http
+from django.shortcuts import redirect
 from django.views.generic.simple import direct_to_template
 
 from djopenid import util
@@ -106,10 +107,12 @@ def idPage(request, user):
     """
     Serve the identity page for OpenID URLs.
     """
-    return direct_to_template(
-        request,
-        'server/idPage.html',
-        {'server_url': getViewURL(request, endpoint)})
+    if request.session.get('ldap_uid') and request.session['ldap_uid'] == user:
+        return direct_to_template(
+            request,
+            'server/idPage.html',
+            {'server_url': getViewURL(request, endpoint)})
+    return redirect(getViewURL(request, 'ldapauth.login'))
 
 def trustPage(request):
     """
