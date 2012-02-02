@@ -20,7 +20,6 @@ import pickle
 import base64
 
 from django import http
-from django.shortcuts import redirect
 from django.views.generic.simple import direct_to_template
 
 from djopenid import util
@@ -128,28 +127,28 @@ def endpoint(request):
     """
     Respond to low-level OpenID protocol messages.
     """
-    if not util.isLogging(request):
-        #query = util.normalDict(request.GET or request.POST)
-        #if not query.get('data', ''):
-        #    print 1
-        #    print query
-        #    return direct_to_template(request, 'server/login.html', 
-        #                {'ret': '', 'data': base64.encodestring(pickle.dumps(query)).strip('\n'), 
-        #                'url': getViewURL(request, endpoint), 'referer': request.META.get('HTTP_REFERER', '')})
-        #elif not util.authWithLdap(request, query.get('user'), query.get('passwd'), query.get('remember', '')):
-        #    print 2
-        #    print query
-        #    return direct_to_template(request, 'server/login.html', 
-        #                {'ret': 'error<a href='+ query.get('referer') + '>back</a>', 
-        #                'data': query['data'], 'url': getViewURL(request, endpoint), 
-        #                'referer': query.get('referer')})
-        #query = pickle.loads(base64.decodestring(query['data']))
-        return redirect('ldapauth.login')
-    else:
-        query = util.normalDict(request.GET or request.POST)
 #    query = util.normalDict(request.GET or request.POST)
 
     s = getServer(request)
+
+    if not util.isLogging(request):
+        query = util.normalDict(request.GET or request.POST)
+        if not query.get('data', ''):
+            print 1
+            print query
+            return direct_to_template(request, 'server/login.html', 
+                        {'ret': '', 'data': base64.encodestring(pickle.dumps(query)).strip('\n'), 
+                        'url': getViewURL(request, endpoint), 'referer': request.META.get('HTTP_REFERER', '')})
+        elif not util.authWithLdap(request, query.get('user'), query.get('passwd'), query.get('remember', '')):
+            print 2
+            print query
+            return direct_to_template(request, 'server/login.html', 
+                        {'ret': 'error<a href='+ query.get('referer') + '>back</a>', 
+                        'data': query['data'], 'url': getViewURL(request, endpoint), 
+                        'referer': query.get('referer')})
+        query = pickle.loads(base64.decodestring(query['data']))
+    else:
+        query = util.normalDict(request.GET or request.POST)
 
     # First, decode the incoming request into something the OpenID
     # library can use.
