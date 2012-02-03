@@ -124,7 +124,7 @@ def endpoint(request):
     Respond to low-level OpenID protocol messages.
     """
     query = util.normalDict(request.GET or request.POST)
-    if not query.get('data', ''):
+    if query.get('data', ''):
         if not util.authWithLdap(request, query.get('user'), query.get('passwd'), query.get('remember', '')):
             print 2
             print query
