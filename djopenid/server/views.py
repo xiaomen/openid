@@ -114,8 +114,6 @@ def trustPage(request):
     Display the trust page template, which allows the user to decide
     whether to approve the OpenID verification.
     """
-    if not util.isLogging(request):
-        return http.HttpResponseRedirect('/auth/')
     return direct_to_template(
         request,
         'server/trust.html',
@@ -263,8 +261,6 @@ def processTrustResult(request):
     Handle the result of a trust decision and respond to the RP
     accordingly.
     """
-    if not util.isLogging(request):
-        return http.HttpResponseRedirect('/auth/')
     # Get the request from the session so we can construct the
     # appropriate response.
     openid_request = getRequest(request)
