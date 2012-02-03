@@ -126,8 +126,6 @@ def endpoint(request):
     query = util.normalDict(request.GET or request.POST)
     if query.get('data', ''):
         if not util.authWithLdap(request, query.get('user'), query.get('passwd'), query.get('remember', '')):
-            print 2
-            print query
             return direct_to_template(request, 'server/login.html', 
                         {'ret': 'error<a href='+ query.get('referer') + '>back</a>', 
                         'data': query['data'], 'url': getViewURL(request, endpoint), 
@@ -180,12 +178,9 @@ def handleCheckIDRequest(request, openid_request):
     for k in dir(openid_request):
         if k.startswith('_'):
             continue
-    print request.session.keys()
     if not util.isLogging(request):
         query = util.normalDict(request.GET or request.POST)
         #if not query.get('data', ''):
-        print 1
-        print query
         return direct_to_template(request, 'server/login.html', 
                     {'ret': '', 'data': base64.encodestring(pickle.dumps(query)).strip('\n'), 
                     'url': getViewURL(request, endpoint), 'referer': request.META.get('HTTP_REFERER', '')})
