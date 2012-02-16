@@ -180,6 +180,7 @@ def handleCheckIDRequest(request, openid_request):
         if k.startswith('_'):
             continue
     if not util.isLogging(request):
+        #TODO if not login and accept is not html, return json
         query = util.normalDict(request.GET or request.POST)
         return direct_to_template(request, 'server/login.html', 
                     {'ret': '', 'data': base64.encodestring(pickle.dumps(query)).strip('\n'), 
