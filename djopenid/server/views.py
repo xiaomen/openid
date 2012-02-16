@@ -123,6 +123,7 @@ def endpoint(request):
     """
     Respond to low-level OpenID protocol messages.
     """
+    #TODO add json return when accept is not html
     query = util.normalDict(request.GET or request.POST)
     if query.get('data', ''):
         if not util.authWithLdap(request, query.get('user'), query.get('passwd'), query.get('remember', '')):
