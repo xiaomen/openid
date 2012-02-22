@@ -16,6 +16,7 @@ Some code conventions used here:
 """
 
 import cgi
+import json
 import pickle
 import base64
 
@@ -124,13 +125,29 @@ def endpoint(request):
     Respond to low-level OpenID protocol messages.
     """
     #TODO add json return when accept is not html
+    ret_json = request.META.get('HTTP_ACCEPT', False) and \
+            not (request.META['HTTP_ACCEPT'].find('html') > -1)
+
     query = util.normalDict(request.GET or request.POST)
     if query.get('data', ''):
         if not util.authWithLdap(request, query.get('user'), query.get('passwd'), query.get('remember', '')):
-            return direct_to_template(request, 'server/login.html', 
-                        {'ret': 'error<a href='+ query.get('referer') + '>back</a>', 
-                        'data': query['data'], 'url': getViewURL(request, endpoint), 
-                        'referer': query.get('referer')})
+            if not ret_json:
+                return direct_to_template(request, 'server/login.html', 
+                            {'ret': 'error<a href='+ query.get('referer') + '>back</a>', 
+                            'data': query['data'], 'url': getViewURL(request, endpoint), 
+                            'referer': query.get('referer')})
+            else:
+                response_data = {'prompt': 'openid login', \
+                        'action': getViewURL(request, endpoint), \
+                        'method': 'POST', \
+                        'fields': [
+                            {'type': 'text', 'name': 'username', 'label': 'Username: '},
+                            {'type': 'password', 'name': 'password', 'label': 'Password: '},
+                            {'type': 'hidden', 'name': 'data', 'value': query['data']},
+
+                        ]
+                }
+                return http.HttpResponse(json.dumps(response_data), mimetype="application/json")
         query = pickle.loads(base64.decodestring(query['data']))
 
     s = getServer(request)
@@ -181,10 +198,27 @@ def handleCheckIDRequest(request, openid_request):
             continue
     if not util.isLogging(request):
         #TODO if not login and accept is not html, return json
+        ret_json = request.META.get('HTTP_ACCEPT', False) and \
+            not (request.META['HTTP_ACCEPT'].find('html') > -1)
+
         query = util.normalDict(request.GET or request.POST)
-        return direct_to_template(request, 'server/login.html', 
+        if not ret_json:
+            return direct_to_template(request, 'server/login.html', 
                     {'ret': '', 'data': base64.encodestring(pickle.dumps(query)).strip('\n'), 
                     'url': getViewURL(request, endpoint), 'referer': request.META.get('HTTP_REFERER', '')})
+        else:
+            response_data = {'prompt': 'openid login', \
+                             'action': getViewURL(request, endpoint), \
+                             'method': 'POST', \
+                             'fields': [
+                                 {'type': 'text', 'name': 'username', 'label': 'Username: '},
+                                 {'type': 'password', 'name': 'password', 'label': 'Password: '},
+                                 {'type': 'hidden', 'name': 'data', 'value': base64.encodestring(pickle.dumps(query)).strip('\n')},
+
+                             ]
+            }
+            return http.HttpResponse(json.dumps(response_data), mimetype="application/json")
+
 
     if not openid_request.idSelect():
 
