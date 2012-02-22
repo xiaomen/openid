@@ -124,7 +124,6 @@ def endpoint(request):
     """
     Respond to low-level OpenID protocol messages.
     """
-    #TODO add json return when accept is not html
     ret_json = request.META.get('HTTP_ACCEPT', False) and \
             not (request.META['HTTP_ACCEPT'].find('html') > -1)
 
@@ -197,7 +196,6 @@ def handleCheckIDRequest(request, openid_request):
         if k.startswith('_'):
             continue
     if not util.isLogging(request):
-        #TODO if not login and accept is not html, return json
         ret_json = request.META.get('HTTP_ACCEPT', False) and \
             not (request.META['HTTP_ACCEPT'].find('html') > -1)
 
@@ -218,7 +216,6 @@ def handleCheckIDRequest(request, openid_request):
                              ]
             }
             return http.HttpResponse(json.dumps(response_data), mimetype="application/json")
-
 
     if not openid_request.idSelect():
 
