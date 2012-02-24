@@ -126,6 +126,8 @@ def endpoint(request):
     """
     ret_json = request.META.get('HTTP_ACCEPT', False) and \
             not (request.META['HTTP_ACCEPT'].find('html') > -1)
+    print request.META
+    print ret_json
 
     query = util.normalDict(request.GET or request.POST)
     if query.get('data', ''):
@@ -198,8 +200,6 @@ def handleCheckIDRequest(request, openid_request):
     if not util.isLogging(request):
         ret_json = request.META.get('HTTP_ACCEPT', False) and \
             not (request.META['HTTP_ACCEPT'].find('html') > -1)
-        print request.META
-        print ret_json
 
         query = util.normalDict(request.GET or request.POST)
         if not ret_json:
