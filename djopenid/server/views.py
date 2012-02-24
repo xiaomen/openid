@@ -19,6 +19,7 @@ import cgi
 import json
 import pickle
 import base64
+import logging
 
 from django import http
 from django.views.generic.simple import direct_to_template
@@ -35,6 +36,8 @@ from openid.consumer.discover import OPENID_IDP_2_0_TYPE
 from openid.extensions import sreg
 from openid.extensions import pape
 from openid.fetchers import HTTPFetchingError
+
+logger = logging.getLogger()
 
 def getOpenIDStore():
     """
@@ -126,8 +129,8 @@ def endpoint(request):
     """
     ret_json = request.META.get('HTTP_ACCEPT', False) and \
             not (request.META['HTTP_ACCEPT'].find('html') > -1)
-    print request.META
-    print ret_json
+    logger.info(request.META)
+    logger.info(ret_json)
 
     query = util.normalDict(request.GET or request.POST)
     if query.get('data', ''):
