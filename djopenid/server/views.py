@@ -145,8 +145,8 @@ def endpoint(request):
                         'action': getViewURL(request, endpoint), \
                         'method': 'POST', \
                         'fields': [
-                            {'type': 'text', 'name': 'username', 'label': 'Username: '},
-                            {'type': 'password', 'name': 'password', 'label': 'Password: '},
+                            {'type': 'text', 'name': 'user', 'label': 'Username: '},
+                            {'type': 'password', 'name': 'passwd', 'label': 'Password: '},
                             {'type': 'hidden', 'name': 'data', 'value': query['data']},
 
                         ]
@@ -214,8 +214,8 @@ def handleCheckIDRequest(request, openid_request):
                              'action': getViewURL(request, endpoint), \
                              'method': 'POST', \
                              'fields': [
-                                 {'type': 'text', 'name': 'username', 'label': 'Username: '},
-                                 {'type': 'password', 'name': 'password', 'label': 'Password: '},
+                                 {'type': 'text', 'name': 'user', 'label': 'Username: '},
+                                 {'type': 'password', 'name': 'passwd', 'label': 'Password: '},
                                  {'type': 'hidden', 'name': 'data', 'value': base64.encodestring(pickle.dumps(query)).strip('\n')},
 
                              ]
