@@ -2,6 +2,7 @@ application: openid
 version: 1
 runtime: python
 api_version: 1
+irc_report_channel: dae
 
 handlers:
 - url: /.*
