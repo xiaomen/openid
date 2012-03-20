@@ -339,6 +339,11 @@ def displayResponse(request, openid_response):
     will be sent using the proper mechanism (i.e., direct response,
     redirection, etc.).
     """
+    ret_json = request.META.get('HTTP_ACCEPT', False) and \
+            not (request.META['HTTP_ACCEPT'].find('html') > -1)
+    if ret_json:
+        return http.HttpResponse(json.dumps({'status': 'ok'}), mimetype="application/json")
+
     s = getServer(request)
 
     # Encode the response into something that is renderable.
