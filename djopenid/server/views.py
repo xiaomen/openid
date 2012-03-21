@@ -200,8 +200,7 @@ def handleCheckIDRequest(request, openid_request):
     for k in dir(openid_request):
         if k.startswith('_'):
             continue
-    print
-    print 'loggin', util.isLogging(request)
+
     if not util.isLogging(request):
         ret_json = request.META.get('HTTP_ACCEPT', False) and \
             not (request.META['HTTP_ACCEPT'].find('html') > -1)
@@ -238,8 +237,6 @@ def handleCheckIDRequest(request, openid_request):
 
             return displayResponse(request, error_response)
 
-    print
-    print 'openid_request.immediate', str(openid_request.immediate)
     if openid_request.immediate:
         # Always respond with 'cancel' to immediate mode requests
         # because we don't track information about a logged-in user.
@@ -261,11 +258,17 @@ def showDecidePage(request, openid_request):
 
     @type openid_request: openid.server.server.CheckIDRequest
     """
+    print
+    print 'showDecidePage...'
     trust_root = openid_request.trust_root
     return_to = openid_request.return_to
 
     auth_site = AuthSites.objects.filter(uid = request.session['ldap_uid'], site = trust_root)
+    print
+    print auth_site
     if auth_site:
+        print
+        print 'auth_site[0].permission', auth_site[0].permission
         if auth_site[0].permission == 1:
             request.POST = ['allow', ]
             return processTrustResult(request)
