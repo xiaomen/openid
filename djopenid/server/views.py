@@ -258,17 +258,11 @@ def showDecidePage(request, openid_request):
 
     @type openid_request: openid.server.server.CheckIDRequest
     """
-    print
-    print 'showDecidePage...'
     trust_root = openid_request.trust_root
     return_to = openid_request.return_to
 
     auth_site = AuthSites.objects.filter(uid = request.session['ldap_uid'], site = trust_root)
-    print
-    print auth_site
     if auth_site:
-        print
-        print 'auth_site[0].permission', auth_site[0].permission
         if auth_site[0].permission == 1:
             request.POST = ['allow', ]
             return processTrustResult(request)
