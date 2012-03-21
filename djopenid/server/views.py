@@ -177,8 +177,6 @@ def endpoint(request):
 
     # We got a request; if the mode is checkid_*, we will handle it by
     # getting feedback from the user or by checking the session.
-    print '--------- openid_request.mode ---------'
-    print openid_request.mode
     if openid_request.mode in ["checkid_immediate", "checkid_setup"]:
         return handleCheckIDRequest(request, openid_request)
     else:
@@ -202,6 +200,8 @@ def handleCheckIDRequest(request, openid_request):
     for k in dir(openid_request):
         if k.startswith('_'):
             continue
+    print
+    print 'loggin', util.isLogging(request)
     if not util.isLogging(request):
         ret_json = request.META.get('HTTP_ACCEPT', False) and \
             not (request.META['HTTP_ACCEPT'].find('html') > -1)
@@ -238,6 +238,8 @@ def handleCheckIDRequest(request, openid_request):
 
             return displayResponse(request, error_response)
 
+    print
+    print 'openid_request.immediate', str(openid_request.immediate)
     if openid_request.immediate:
         # Always respond with 'cancel' to immediate mode requests
         # because we don't track information about a logged-in user.
