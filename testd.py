@@ -17,4 +17,5 @@ if __name__ == '__main__':
         #     fp.flush()
         print >>fp, 'done.\n'
         i += 1
+        fp.flush()
         time.sleep(5)
