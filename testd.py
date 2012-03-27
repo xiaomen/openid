@@ -12,9 +12,9 @@ if __name__ == '__main__':
     print >>fp, '\n'
     while True:
         print >>fp, 'starting...'
-        for row in AuthSites.objects.all():
-            print >>fp, i, row.id
-            fp.flush()
+        # for row in AuthSites.objects.all():
+        #     print >>fp, i, row.id
+        #     fp.flush()
         print >>fp, 'done.\n'
         i += 1
         time.sleep(5)
