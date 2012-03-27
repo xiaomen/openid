@@ -14,9 +14,9 @@ if __name__ == '__main__':
     while True:
         print >>fp, 'starting...'
         print >>fp, MySQLdb.dae_patched
-        # for row in AuthSites.objects.all():
-        #     print >>fp, i, row.id
-        #     fp.flush()
+        for row in AuthSites.objects.all():
+            print >>fp, i, row.id
+            fp.flush()
         print >>fp, 'done.\n'
         i += 1
         fp.flush()
