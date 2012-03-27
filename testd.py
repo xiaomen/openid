@@ -4,6 +4,7 @@ import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'djopenid.settings'
 
 import time
+import MySQLdb
 from djopenid.server.models import AuthSites
 
 if __name__ == '__main__':
@@ -12,6 +13,7 @@ if __name__ == '__main__':
     print >>fp, '\n'
     while True:
         print >>fp, 'starting...'
+        print >>fp, MySQLdb.dae_patched
         # for row in AuthSites.objects.all():
         #     print >>fp, i, row.id
         #     fp.flush()
