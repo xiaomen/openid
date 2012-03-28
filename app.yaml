@@ -8,8 +8,3 @@ report_observer_emails: dae@douban.com
 handlers:
 - url: /.*
   wsgi_app: app:app
-
-daemons:
-- name: test
-  num_instances: 1
-  script: testd.py
