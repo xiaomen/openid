@@ -1,0 +1,5 @@
+permdir/
+venv/
+*.pyc
+db_dumps.sql
+dev.yaml
