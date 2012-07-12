@@ -6,5 +6,10 @@ irc_report_channel: dae
 report_observer_emails: dae@douban.com
 
 handlers:
+- url: /admin/media/(.*)
+  static_files: ${VENV_SITE_PACKAGES}/django/contrib/admin/media/\1
+  upload: ${VENV_SITE_PACKAGES}/django/contrib/admin/media/(.*)
+
 - url: /.*
   wsgi_app: app:app
+

@@ -22,6 +22,10 @@ PAPE_POLICIES = [
 POLICY_PAIRS = [(p, getattr(pape, p))
                 for p in PAPE_POLICIES]
 
+sreg.data_fields = {'username': 'test',
+                    'email': 'test@douban.com',
+                    'uid': '0'}
+
 def getOpenIDStore():
     """
     Return an OpenID store object fit for the currently-chosen
@@ -83,7 +87,7 @@ def startOpenID(request):
         # server doesn't support sreg or won't return any of the
         # fields.
         sreg_request = sreg.SRegRequest(optional=['username', 'uid'],
-                                        required=['mail'])
+                                        required=['email'])
         auth_request.addExtension(sreg_request)
 
         # Add Attribute Exchange request information.

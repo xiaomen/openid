@@ -8,6 +8,5 @@ urlpatterns = patterns(
     (r'^processTrustResult/$', 'processTrustResult'),
     (r'^endpoint/$', 'endpoint'),
     (r'^trust/$', 'trustPage'),
-    (r'^delete/$', 'manager'),
     (r'^(?P<user>.*)/$', 'idPage'),
 )

@@ -69,33 +69,8 @@ def getRequest(request):
     """
     return request.session.get('openid_request')
 
-def manager(request):
-    """
-    Manager auth sites
-    """
-    index = request.GET.get('index')
-    if not request.user.is_authenticated() or request.method == 'POST'\
-        or not index or not index.isdigit():
-        return http.HttpResponseRedirect('/server/')
-    r = AuthSites.objects.filter(uid = request.user.id, id = int(index))
-    if r:
-        r = r[0]
-        r.delete()
-    return http.HttpResponse('Success <a href="/server/">back</a>')
-
-@login_required(login_url='/auth/')
 def server(request):
-    """
-    Respond to requests for the server's primary web page.
-    """
-    return direct_to_template(
-        request,
-        'server/index.html',
-        {'user_url': getViewURL(request, idPage, args=[request.user.id]),
-         'user_id': request.user.id,
-         'server_xrds_url': getViewURL(request, idpXrds),
-         'auth_sites': AuthSites.objects.filter(uid = request.user.id),
-        })
+    return http.HttpResponseRedirect('/admin')
 
 def idpXrds(request):
     """
@@ -138,11 +113,13 @@ def endpoint(request):
         #TODO no use query.get('remember', '')
         user = authenticate(username=query.get('user'), password=query.get('passwd'))
         if not user or not user.is_active:
+            next_url = query.get('next') or request.META.get('HTTP_REFERER', '')
             if not ret_json:
                 return direct_to_template(request, 'server/login.html', 
-                            {'ret': 'error<a href='+ query.get('referer') + '>back</a>', 
-                            'data': query['data'], 'url': getViewURL(request, endpoint), 
-                            'referer': query.get('referer')})
+                            {'ret': 'error<a href=' + next_url + '>back</a>', 
+                             'data': query['data'], 
+                             'url': getViewURL(request, endpoint), 
+                             'next': next_url})
             else:
                 response_data = {'prompt': 'openid login', \
                         'action': getViewURL(request, endpoint), \
@@ -213,7 +190,7 @@ def handleCheckIDRequest(request, openid_request):
         if not ret_json:
             return direct_to_template(request, 'server/login.html', 
                     {'ret': '', 'data': base64.encodestring(pickle.dumps(query)).strip('\n'), 
-                    'url': getViewURL(request, endpoint), 'referer': request.META.get('HTTP_REFERER', '')})
+                    'url': getViewURL(request, endpoint), 'next': request.GET.get('next', '')})
         else:
             response_data = {'prompt': 'openid login', \
                              'action': getViewURL(request, endpoint), \
@@ -256,6 +233,7 @@ def handleCheckIDRequest(request, openid_request):
         setRequest(request, openid_request)
         return showDecidePage(request, openid_request)
 
+@login_required
 def showDecidePage(request, openid_request):
     """
     Render a page to the user so a trust decision can be made.
@@ -293,6 +271,7 @@ def showDecidePage(request, openid_request):
          'pape_request': pape_request,
          })
 
+@login_required
 def processTrustResult(request):
     """
     Handle the result of a trust decision and respond to the RP
@@ -325,11 +304,10 @@ def processTrustResult(request):
                             permission = 1)
             auth_site.save()
 
-        #TODO
         #sreg_data = dict((k, str(v)) for k, v in request.session['ldap_info'].iteritems())
-        sreg_data = {'username': 'test',
-                    'mail': 'test@douban.com',
-                    'uid': '1'}
+        sreg_data = {'username': request.user.username,
+                    'mail': request.user.email,
+                    'uid': str(request.user.id)}
 
         sreg_req = sreg.SRegRequest.fromOpenIDRequest(openid_request)
         sreg_resp = sreg.SRegResponse.extractResponse(sreg_req, sreg_data)
