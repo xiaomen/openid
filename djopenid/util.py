@@ -19,34 +19,12 @@ from openid.store.filestore import FileOpenIDStore
 from openid.store import sqlstore
 from openid.yadis.constants import YADIS_CONTENT_TYPE
 
-from doubanldap import DoubanLDAP
-
 def cleanSession(request):
     try:
         request.session.flush()
         request.session.set_expiry(0)
     except:
         pass
-
-def authWithLdap(request, user, passwd, remember = ''):
-    try:
-        ldap_check = DoubanLDAP()
-        ldap_check.bind(user, passwd)
-        request.session['ldap_login'] = 1
-        request.session['ldap_info'] = ldap_check.searchuserbyid(user)[0]
-        request.session['ldap_uid'] = user
-        if remember == '':
-            request.session.set_expiry(0)
-        return True
-    except:
-        import traceback
-        traceback.print_exc()
-    return False
-
-def isLogging(request):
-    if not request.session.keys() or not request.session.get('ldap_login', None):
-        return False
-    return True
 
 def getOpenIDStore(filestore_path, table_prefix):
     """
