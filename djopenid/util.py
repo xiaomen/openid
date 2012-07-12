@@ -19,13 +19,6 @@ from openid.store.filestore import FileOpenIDStore
 from openid.store import sqlstore
 from openid.yadis.constants import YADIS_CONTENT_TYPE
 
-def cleanSession(request):
-    try:
-        request.session.flush()
-        request.session.set_expiry(0)
-    except:
-        pass
-
 def getOpenIDStore(filestore_path, table_prefix):
     """
     Returns an OpenID association store object based on the database

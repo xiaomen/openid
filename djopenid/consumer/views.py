@@ -18,16 +18,6 @@ PAPE_POLICIES = [
     'AUTH_MULTI_FACTOR_PHYSICAL',
     ]
 
-sreg.data_fields = {'cn': ['test'],
-                    'mail': ['test@douban.com'],
-                    'objectClass': ['inetOrgPerson',
-                                   'organizationalPerson',
-                                   'person',
-                                   'top',
-                                   'uidObject'],
-                    'sn': ['1'],
-                    'uid': ['test1']}
-
 # List of (name, uri) for use in generating the request form.
 POLICY_PAIRS = [(p, getattr(pape, p))
                 for p in PAPE_POLICIES]
@@ -73,8 +63,8 @@ def startOpenID(request):
     if request.POST:
         # Start OpenID authentication.
         openid_url = request.POST['openid_identifier'] or \
-                     ((settings.BASE_AUTH_SITE % request.POST['ldap_identifier']) \
-                     if request.POST['ldap_identifier'] else None)
+                     ((settings.BASE_AUTH_SITE % request.POST['sub_identifier']) \
+                     if request.POST['sub_identifier'] else '')
         c = getConsumer(request)
         error = None
 
@@ -92,7 +82,7 @@ def startOpenID(request):
         # are optional, some are required.  It's possible that the
         # server doesn't support sreg or won't return any of the
         # fields.
-        sreg_request = sreg.SRegRequest(optional=['cn', 'sn'],
+        sreg_request = sreg.SRegRequest(optional=['username', 'uid'],
                                         required=['mail'])
         auth_request.addExtension(sreg_request)
 
