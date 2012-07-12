@@ -326,7 +326,10 @@ def processTrustResult(request):
             auth_site.save()
 
         #TODO
-        sreg_data = dict((k, str(v)) for k, v in request.session['ldap_info'].iteritems())
+        #sreg_data = dict((k, str(v)) for k, v in request.session['ldap_info'].iteritems())
+        sreg_data = {'username': 'test',
+                    'mail': 'test@douban.com',
+                    'uid': '1'}
 
         sreg_req = sreg.SRegRequest.fromOpenIDRequest(openid_request)
         sreg_resp = sreg.SRegResponse.extractResponse(sreg_req, sreg_data)

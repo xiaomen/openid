@@ -17,7 +17,9 @@ ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
 
-BASE_AUTH_SITE = 'http://openid.dapps.douban.com/server/%s/'
+#BASE_AUTH_SITE = 'http://openid.dapps.douban.com/server/%s/'
+BASE_AUTH_SITE = 'http://127.0.0.1:9000/server/%s/'
+
 
 MANAGERS = ADMINS
 
