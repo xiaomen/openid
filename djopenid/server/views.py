@@ -206,7 +206,7 @@ def handleCheckIDRequest(request, openid_request):
 
     if not openid_request.idSelect():
 
-        id_url = getViewURL(request, idPage, args=[request.user.id])
+        id_url = getViewURL(request, idPage, args=[request.user.username])
         # Confirm that this server can actually vouch for that
         # identifier
         if id_url != openid_request.identity:
@@ -282,7 +282,7 @@ def processTrustResult(request):
     openid_request = getRequest(request)
 
     # The identifier that this server can vouch for
-    response_identity = getViewURL(request, idPage, args=[request.user.id])
+    response_identity = getViewURL(request, idPage, args=[request.user.username])
 
     # If the decision was to allow the verification, respond
     # accordingly.
@@ -304,10 +304,9 @@ def processTrustResult(request):
                             permission = 1)
             auth_site.save()
 
-        #sreg_data = dict((k, str(v)) for k, v in request.session['ldap_info'].iteritems())
         sreg_data = {'username': request.user.username,
-                    'mail': request.user.email,
-                    'uid': str(request.user.id)}
+                     'mail': request.user.email,
+                     'uid': str(request.user.id)}
 
         sreg_req = sreg.SRegRequest.fromOpenIDRequest(openid_request)
         sreg_resp = sreg.SRegResponse.extractResponse(sreg_req, sreg_data)
