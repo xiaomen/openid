@@ -70,6 +70,7 @@ def getRequest(request):
     """
     return request.session.get('openid_request')
 
+@login_required(login_url='/auth/')
 def server(request):
     return http.HttpResponseRedirect('/admin')
 

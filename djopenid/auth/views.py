@@ -18,7 +18,7 @@ def sign_in(request):
         user, passwd = request.POST.get('user', None), request.POST.get('passwd', None)
         next_url = request.POST.get('next', None)
         remember = request.POST.get('remember', '')
-        user = _sign_in(request, user, password)
+        user = _sign_in(request, user, passwd)
         if not user:
             return direct_to_template(request, 'server/login.html', {'ret': 'error', 'next': next_url, 'url': '/auth/'})
         if not next_url:
