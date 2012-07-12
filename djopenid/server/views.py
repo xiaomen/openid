@@ -22,7 +22,6 @@ import base64
 import logging
 
 from django import http
-from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
 
@@ -38,6 +37,8 @@ from openid.consumer.discover import OPENID_IDP_2_0_TYPE
 from openid.extensions import sreg
 from openid.extensions import pape
 from openid.fetchers import HTTPFetchingError
+
+from djopenid.auth.views import _sign_in
 
 logger = logging.getLogger()
 
@@ -105,13 +106,13 @@ def endpoint(request):
     """
     ret_json = request.META.get('HTTP_ACCEPT', False) and \
             not (request.META['HTTP_ACCEPT'].find('html') > -1)
-    logger.info(request.META)
-    logger.info(ret_json)
 
     query = util.normalDict(request.GET or request.POST)
     if query.get('data', ''):
         #TODO no use query.get('remember', '')
-        user = authenticate(username=query.get('user'), password=query.get('passwd'))
+        username = query.get('user')
+        password = query.get('passwd')
+        user = _sign_in(request, username, password)
         if not user or not user.is_active:
             next_url = query.get('next') or request.META.get('HTTP_REFERER', '')
             if not ret_json:
@@ -132,7 +133,6 @@ def endpoint(request):
                         ]
                 }
                 return http.HttpResponse(json.dumps(response_data), mimetype="application/json")
-        login(request, user)
         query = pickle.loads(base64.decodestring(query['data']))
 
     s = getServer(request)
@@ -188,9 +188,12 @@ def handleCheckIDRequest(request, openid_request):
 
         query = util.normalDict(request.GET or request.POST)
         if not ret_json:
-            return direct_to_template(request, 'server/login.html', 
-                    {'ret': '', 'data': base64.encodestring(pickle.dumps(query)).strip('\n'), 
-                    'url': getViewURL(request, endpoint), 'next': request.GET.get('next', '')})
+            return direct_to_template(request, 'server/login.html',
+                            {'ret': '',
+                             'data': base64.encodestring(pickle.dumps(query)).strip('\n'),
+                             'url': getViewURL(request, endpoint),
+                             'next': request.GET.get('next', request.META.get('HTTP_REFERER', ''))
+                            })
         else:
             response_data = {'prompt': 'openid login', \
                              'action': getViewURL(request, endpoint), \
