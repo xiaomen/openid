@@ -22,6 +22,8 @@ import base64
 import logging
 
 from django import http
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
 
 from djopenid import util
@@ -72,28 +74,27 @@ def manager(request):
     Manager auth sites
     """
     index = request.GET.get('index')
-    if not util.isLogging(request) or request.method == 'POST'\
+    if not request.user.is_authenticated() or request.method == 'POST'\
         or not index or not index.isdigit():
         return http.HttpResponseRedirect('/server/')
-    r = AuthSites.objects.filter(uid = request.session['ldap_uid'], id = int(index))
+    r = AuthSites.objects.filter(uid = request.user.id, id = int(index))
     if r:
         r = r[0]
         r.delete()
     return http.HttpResponse('Success <a href="/server/">back</a>')
 
+@login_required(login_url='/auth/')
 def server(request):
     """
     Respond to requests for the server's primary web page.
     """
-    if not util.isLogging(request):
-        return http.HttpResponseRedirect('/auth/')
     return direct_to_template(
         request,
         'server/index.html',
-        {'user_url': getViewURL(request, idPage, args=[request.session.get('ldap_uid')]),
-         'user_id': request.session['ldap_uid'],
+        {'user_url': getViewURL(request, idPage, args=[request.user.id]),
+         'user_id': request.user.id,
          'server_xrds_url': getViewURL(request, idpXrds),
-         'auth_sites': AuthSites.objects.filter(uid = request.session.get('ldap_uid')),
+         'auth_sites': AuthSites.objects.filter(uid = request.user.id),
         })
 
 def idpXrds(request):
@@ -134,7 +135,9 @@ def endpoint(request):
 
     query = util.normalDict(request.GET or request.POST)
     if query.get('data', ''):
-        if not util.authWithLdap(request, query.get('user'), query.get('passwd'), query.get('remember', '')):
+        #TODO no use query.get('remember', '')
+        user = authenticate(username=query.get('user'), password=query.get('passwd'))
+        if not user or not user.is_active:
             if not ret_json:
                 return direct_to_template(request, 'server/login.html', 
                             {'ret': 'error<a href='+ query.get('referer') + '>back</a>', 
@@ -152,6 +155,7 @@ def endpoint(request):
                         ]
                 }
                 return http.HttpResponse(json.dumps(response_data), mimetype="application/json")
+        login(request, user)
         query = pickle.loads(base64.decodestring(query['data']))
 
     s = getServer(request)
@@ -201,7 +205,7 @@ def handleCheckIDRequest(request, openid_request):
         if k.startswith('_'):
             continue
 
-    if not util.isLogging(request):
+    if not request.user.is_authenticated():
         ret_json = request.META.get('HTTP_ACCEPT', False) and \
             not (request.META['HTTP_ACCEPT'].find('html') > -1)
 
@@ -225,7 +229,7 @@ def handleCheckIDRequest(request, openid_request):
 
     if not openid_request.idSelect():
 
-        id_url = getViewURL(request, idPage, args=[request.session.get('ldap_uid', 'NoSuchUser')])
+        id_url = getViewURL(request, idPage, args=[request.user.id])
         # Confirm that this server can actually vouch for that
         # identifier
         if id_url != openid_request.identity:
@@ -261,7 +265,7 @@ def showDecidePage(request, openid_request):
     trust_root = openid_request.trust_root
     return_to = openid_request.return_to
 
-    auth_site = AuthSites.objects.filter(uid = request.session['ldap_uid'], site = trust_root)
+    auth_site = AuthSites.objects.filter(uid = request.user.id, site = trust_root)
     if auth_site:
         if auth_site[0].permission == 1:
             request.POST = ['allow', ]
@@ -299,7 +303,7 @@ def processTrustResult(request):
     openid_request = getRequest(request)
 
     # The identifier that this server can vouch for
-    response_identity = getViewURL(request, idPage, args=[request.session['ldap_uid']])
+    response_identity = getViewURL(request, idPage, args=[request.user.id])
 
     # If the decision was to allow the verification, respond
     # accordingly.
@@ -312,15 +316,16 @@ def processTrustResult(request):
     if allowed:
         if ('allow' in request.POST) and \
             not AuthSites.objects.filter(
-                uid = request.session['ldap_uid'],
+                uid = request.user.id,
                 site = openid_request.trust_root):
 
             auth_site = AuthSites.objects.create(
-                            uid = request.session['ldap_uid'],
+                            uid = request.user.id,
                             site = openid_request.trust_root,
                             permission = 1)
             auth_site.save()
 
+        #TODO
         sreg_data = dict((k, str(v)) for k, v in request.session['ldap_info'].iteritems())
 
         sreg_req = sreg.SRegRequest.fromOpenIDRequest(openid_request)
